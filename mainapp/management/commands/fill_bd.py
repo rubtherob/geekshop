@@ -13,7 +13,7 @@ def load_from_json(file_name):
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        categories = load_from_json('Category.json')
+        categories = load_from_json('mainapp/fixtures/Category.json')
 
         ProductCategory.objects.all().delete()
         for category in categories:
@@ -22,13 +22,13 @@ class Command(BaseCommand):
             new_category = ProductCategory(**cat)
             new_category.save()
 
-        products = load_from_json('products.json')
+        products = load_from_json('mainapp/fixtures/products.json')
 
         Product.objects.all().delete()
         for product in products:
             prod = product.get('fields')
             category = prod.get('category')
-            _category = Product.objects.get(id=category)
+            _category = ProductCategory.objects.get(id=category)
             prod['category'] = _category
             new_category = Product(**prod)
             new_category.save()

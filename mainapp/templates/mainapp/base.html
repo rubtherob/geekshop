@@ -44,6 +44,9 @@
                 </li>
                 {%  else %}
                 <li class="nav-item">
+                    <a class="nav-link active" href="{% url "authapp:profile" %}">User <i class="fas fa-user-circle"></i></a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href={%  url 'authapp:logout' %}>Выйти <i class="fas fa-sign-in-alt"></i></a>
                 </li>
                 {% endif %}

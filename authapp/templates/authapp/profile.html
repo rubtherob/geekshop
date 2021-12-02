@@ -77,9 +77,13 @@
                         </div>
                     </div>
                 </form>
-                </form>
             </div>
-            {% include 'authapp/basket.html' %}
+            <div class="col-lg-5">
+            {% include 'baskets/basket.html' %}
+            </div>
         </div>
     </div>
+{% endblock %}
+{% block Ajax %}
+    <script src='{% static 'js/basket.js' %}'></script>
 {% endblock %}

@@ -20,3 +20,10 @@ def products(request):
         'products': Product.objects.all()
     }
     return render(request, 'mainapp/products.html', context)
+
+def detail(request,pk):
+    context = {
+        'title': 'geekbrains - детали',
+        'product': Product.objects.get(id=pk)
+    }
+    return render(request, 'mainapp/detail.html', context)

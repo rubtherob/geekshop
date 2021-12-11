@@ -1,13 +1,16 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, JsonResponse
-from django.shortcuts import render
-
+from django.shortcuts import render, get_object_or_404
 
 # Create your views here.
 from django.template.loader import render_to_string
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views.generic import DeleteView, UpdateView
 
 from baskets.models import Basket
+
 from mainapp.models import Product
 
 
@@ -44,10 +47,17 @@ def add_product(request, id):
     return JsonResponse({'result': result})
 
 
-@login_required
-def delete_product(request, basket_id):
-    Basket.objects.get(id=basket_id).delete()
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+class DeleteProduct(DeleteView):
+    model = Basket
+    template_name = 'baskets/basket.html'
+    success_url = reverse_lazy('index')
+    context_object_name = 'basket'
+
+
+    @method_decorator(login_required())
+    def dispatch(self, request, *args, **kwargs):
+        return super(DeleteProduct, self).dispatch(request, *args, **kwargs)
 
 
 @login_required
@@ -67,3 +77,5 @@ def edit_basket(request, id_basket, quantity):
         }
         result = render_to_string('baskets/basket.html', context)
         return JsonResponse({'result': result})
+
+

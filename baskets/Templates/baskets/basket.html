@@ -14,14 +14,16 @@
                         <div class="row text-center">
                             <div class="col-lg-4">
                                 <input name="{{ basket.id }}" type="number" class="form-control"
-                                       value="{{ basket.quantity }}" min="0">
+                                       value="{{ basket.quantity }}" min="0" >
                             </div>
                             <div class="col-lg-4">{{ basket.product.price }}</div>
+                            <form action="{% url 'baskets:delete_product'  basket.id  %}" method="post">
                             <div class="col-lg-4">
-                                <a href="{% url 'baskets:delete_product'  basket.id  %}">
-                                    <i class="fas fa-trash"></i>
+                            {% csrf_token %}
+                                    <button class="fas fa-trash"></button>
                                 </a>
                             </div>
+                            </form>
                         </div>
                     </li>
                 </ul>

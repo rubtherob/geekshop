@@ -1,8 +1,6 @@
-
+from django.views.generic import ListView, DetailView
 from django.shortcuts import render
-from .models import ProductCategory, Product
-
-
+from .models import Product, ProductCategory
 
 
 def index(request):
@@ -14,16 +12,29 @@ def index(request):
 
 
 
-def products(request):
-    context = {
-        'title': 'geekbrains - каталог',
-        'products': Product.objects.all()
-    }
-    return render(request, 'mainapp/products.html', context)
+class Detail(DetailView):
+    model = Product
+    context_object_name = 'product'
+    template_name = 'mainapp/detail.html'
 
-def detail(request,pk):
-    context = {
-        'title': 'geekbrains - детали',
-        'product': Product.objects.get(id=pk)
-    }
-    return render(request, 'mainapp/detail.html', context)
+    def get_context_data(self, *, object_list=None, **kwargs):
+       context = super(Detail, self).get_context_data(**kwargs)
+       context['title'] = 'geekbrains - продукт'
+       return context
+
+
+class ProductView(ListView):
+    paginate_by = 3
+    model = Product
+    context_object_name = 'product'
+    template_name = 'mainapp/products.html'
+    
+    def get_context_data(self, *, object_list=None, **kwargs):
+       context = super(ProductView, self).get_context_data(**kwargs)
+       context['title'] = 'geekbrains - каталог'
+       context['categories'] = ProductCategory.objects.all()
+       if self.kwargs:
+           context['products']=Product.objects.filter(category_id=self.kwargs['id_category'])
+       else:
+           context['products'] = Product.objects.all()
+       return context

@@ -8,5 +8,6 @@ urlpatterns = [
     path('login/', Login.as_view(), name='login'),
     path('register/', CreateUser.as_view(), name='register'),
     path('logout/', Logout.as_view(), name='logout'),
-    path('profile/', Profile.as_view(), name='profile')
+    path('profile/', Profile.as_view(), name='profile'),
+    path('verify/<str:email>/<str:activation_key>/', CreateUser.verify, name='verify')
 ]

@@ -1,17 +1,15 @@
 from django.conf import settings
 from django.contrib import auth, messages
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, LogoutView
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse,reverse_lazy
-from django.views.generic import ListView
-from django.views.generic.edit import CreateView, UpdateView, FormView
+from django.views.generic.edit import UpdateView, FormView
 # Create your views here.
 
 
-from authapp.forms import UserLoginForm, UserRegistrateForm, ChangeProfileForm
+from authapp.forms import UserLoginForm, UserRegistrateForm, ChangeProfileForm, ChangeProfileEditForm
 from authapp.models import User
 from baskets.models import Basket
 
@@ -87,9 +85,15 @@ class Profile(UpdateView):
 
     def get_context_data(self, **kwargs):
         context= super(Profile, self).get_context_data(**kwargs)
-        context['baskets']= Basket.objects.filter(user=self.request.user)
+        context['profile']= ChangeProfileEditForm(instance=self.request.user.userprofile)
         return context
 
+    def post(self, request, *args, **kwargs):
+        form = ChangeProfileForm(data=request.POST, files=request.FILES, instance=request.user)
+        profile_form = ChangeProfileEditForm(request.POST, instance=request.user.userprofile)
+        if form.is_valid() and profile_form.is_valid():
+            form.save()
+        return redirect(self.success_url)
 
 
 class Logout(LogoutView):

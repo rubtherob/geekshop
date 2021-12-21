@@ -28,13 +28,15 @@ class ProductView(ListView):
     model = Product
     context_object_name = 'product'
     template_name = 'mainapp/products.html'
+
+    def get_queryset(self, **kwargs):
+        if self.kwargs:
+            return Product.objects.filter(category_id=self.kwargs['id_category'])
+        return Product.objects.all()
+
     
     def get_context_data(self, *, object_list=None, **kwargs):
        context = super(ProductView, self).get_context_data(**kwargs)
        context['title'] = 'geekbrains - каталог'
        context['categories'] = ProductCategory.objects.all()
-       if self.kwargs:
-           context['products']=Product.objects.filter(category_id=self.kwargs['id_category'])
-       else:
-           context['products'] = Product.objects.all()
        return context

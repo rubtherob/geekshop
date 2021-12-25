@@ -6,10 +6,11 @@ from django.shortcuts import render
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 # Create your views here.
 from django.urls import reverse,reverse_lazy
-
+from ordersapp.forms import OrderForm
 from admins.forms import ProductCategoryForm, AdminCreateForm, AdminUpdateForm, ProductForm
 from authapp.models import User
 from mainapp.models import ProductCategory, Product
+from ordersapp.models import Order
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -240,3 +241,35 @@ class DeleteProduct(DeleteView):
     @method_decorator(user_passes_test(lambda u: u.is_superuser))
     def dispatch(self, request, *args, **kwargs):
         return super(DeleteProduct, self).dispatch(request,*args,**kwargs)
+
+class ReadOrders(ListView):
+    model = Order
+    template_name = 'Update Status Orders/admin-order-read.html'
+    context_object_name = 'orders'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context= super(ReadOrders, self).get_context_data()
+        if self.kwargs:
+            context['orders'] = Order.objects.filter(user=self.kwargs['pk'])
+        return context
+
+    @method_decorator(user_passes_test(lambda u: u.is_superuser))
+    def dispatch(self, request, *args, **kwargs):
+        return super(ReadOrders, self).dispatch(request, *args, **kwargs)
+
+class EditOrder(UpdateView):
+    model = Order
+    form_class = OrderForm
+    template_name= 'Update Status Orders/admin-order-update-delete.html'
+    success_url = reverse_lazy('admins:users')
+    context_object_name = 'orders'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context= super(EditOrder, self).get_context_data()
+        if self.kwargs:
+            context['order'] = Order.objects.get(id=self.kwargs['pk'])
+        return context
+
+    @method_decorator(user_passes_test(lambda u: u.is_superuser))
+    def dispatch(self, request, *args, **kwargs):
+        return super(EditOrder, self).dispatch(request,*args,**kwargs)

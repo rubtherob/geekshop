@@ -20,6 +20,7 @@
                                     <th>Адрес эл. почты</th>
                                     <th>Персонал сайта</th>
                                     <th>Активный</th>
+                                    <th>Заказы</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -41,6 +42,7 @@
                                         {% else %}
                                             <i class="fas fa-times-circle"></i></td>
                                         {% endif %}
+                                        <td><a href="{% url 'admins:orders' user.pk %}" style="color: dodgerblue">Заказы</a></td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>

@@ -28,7 +28,7 @@ load_dotenv(BASE_DIR/'.env')
 SECRET_KEY = 'django-insecure-h+fvcv67=&0f89tzc14nasnmhn$9wya$sxnsab#5+@vnd_&5ia'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -159,7 +159,7 @@ LOGIN_REDIRECT_URL='index'
 LOGIN_ERROR_URL = '/'
 
 
-DOMAIN_NAME = 'http://localhost:8000'
+DOMAIN_NAME = 'http://80.78.241.58/'
 
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = '465'

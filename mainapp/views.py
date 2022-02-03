@@ -57,11 +57,6 @@ class Detail(DetailView):
     context_object_name = 'product'
     template_name = 'mainapp/detail.html'
 
-    def get_context_data(self, *, object_list=None, **kwargs):
-       context = super(Detail, self).get_context_data(**kwargs)
-       context['title'] = 'geekbrains - продукт'
-       context['product'] = get_product(self.kwargs.get("pk"))
-       return context
 
 
 class ProductView(ListView):
@@ -73,7 +68,7 @@ class ProductView(ListView):
     def get_queryset(self, **kwargs):
         if self.kwargs:
             return Product.objects.filter(category_id=self.kwargs['id_category'])
-        return Product.objects.all()
+        return Product.objects.all().order_by('id')
 
     
     def get_context_data(self, *, object_list=None, **kwargs):

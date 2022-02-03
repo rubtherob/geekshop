@@ -11,6 +11,10 @@ from admins.forms import ProductCategoryForm, AdminCreateForm, AdminUpdateForm, 
 from authapp.models import User
 from mainapp.models import ProductCategory, Product
 from ordersapp.models import Order
+from django.dispatch import receiver
+from django.db.models.signals import pre_save
+from django.db import connection
+from django.db.models import F
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -146,6 +150,14 @@ class EditCategory(UpdateView):
         context['title'] = 'geekbrains - админ, изменить категорию'
         return context
 
+    def form_valid(self, form):
+        if 'discount' in form.cleaned_data:
+            discount = form.cleaned_data['discount']
+            if discount:
+                self.object.product_set.update(price=F('price') * (1 - discount / 100))
+                db_profile_by_type(self.__class__, 'UPDATE', connection.queries)
+        return super().form_valid(form)
+
     @method_decorator(user_passes_test(lambda u: u.is_superuser))
     def dispatch(self, request, *args, **kwargs):
         return super(EditCategory, self).dispatch(request,*args,**kwargs)
@@ -157,6 +169,12 @@ class DeleteCategory(DeleteView):
     template_name= 'CRUD product_category/admin-product_category-update-delete.html'
     success_url = reverse_lazy('admins:categories')
     context_object_name = 'category'
+
+    def delete(self,request,*args,**kwargs):
+        self.object= self.get_object()
+        self.object.is_active= False
+        self.object.save()
+        return HttpResponseRedirect(self.success_url)
 
 
 
@@ -198,6 +216,12 @@ class CreateProduct(CreateView):
         context= super(CreateProduct, self).get_context_data()
         context['title'] = 'geekbrains - админ, создать продукт'
         return context
+
+    def delete(self,request,*args,**kwargs):
+        self.object= self.get_object()
+        self.object.is_active= False
+        self.object.save()
+        return HttpResponseRedirect(self.success_url)
 
     @method_decorator(user_passes_test(lambda u: u.is_superuser))
     def dispatch(self, request, *args, **kwargs):
@@ -273,3 +297,19 @@ class EditOrder(UpdateView):
     @method_decorator(user_passes_test(lambda u: u.is_superuser))
     def dispatch(self, request, *args, **kwargs):
         return super(EditOrder, self).dispatch(request,*args,**kwargs)
+
+
+def db_profile_by_type(prefix, type, queries):
+   update_queries = list(filter(lambda x: type in x['sql'], queries))
+   print(f'db_profile {type} for {prefix}:')
+   [print(query['sql']) for query in update_queries]
+
+@receiver(pre_save, sender=ProductCategory)
+def product_is_active_update_productcategory_save(sender, instance, **kwargs):
+   if instance.pk:
+       if instance.is_active:
+           instance.product_set.update(is_active=True)
+       else:
+           instance.product_set.update(is_active=False)
+
+       db_profile_by_type(sender, 'UPDATE', connection.queries)

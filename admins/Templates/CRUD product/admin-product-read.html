@@ -18,7 +18,7 @@
                                     <th>Описание</th>
                                     <th>Цена</th>
                                     <th>Количество на складе</th>
-
+                                    <th>Активная</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -28,7 +28,11 @@
                                         <td>{{ product.description }}</td>
                                         <td>{{ product.price }}</td>
                                         <td>{{ product.quantity }}</td>
-
+                                        <td>{% if product.is_active %}
+                                            <i class="fas fa-check-circle"></i></td>
+                                        {% else %}
+                                            <i class="fas fa-times-circle"></i></td>
+                                        {% endif %}
 
                                     </tr>
                                 {% endfor %}

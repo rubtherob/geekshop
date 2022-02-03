@@ -21,12 +21,19 @@ class Login(LoginView):
     redirect_field_name = reverse_lazy('mainapp:products')
     form_class = UserLoginForm
 
+    def get(self, request, *args, **kwargs):
+        get = super(Login, self).get(request, *args, **kwargs)
+        if request.user.is_authenticated:
+            return HttpResponseRedirect(reverse_lazy(self.success_url))
+        return get
+        self.assertEqual(response.status_code, 302)
+
 
 
 
 class CreateUser(FormView):
     template_name = 'authapp/register.html'
-    success_url = reverse_lazy('authapp:login')
+    success_url = reverse_lazy('index')
     form_class = UserRegistrateForm
 
     def post(self, request, *args, **kwargs):
@@ -49,9 +56,8 @@ class CreateUser(FormView):
     def send_verify_mail(self, user):
         verify_link = reverse('authapp:verify', args=[user.email, user.activation_key])
         title = f'Подтверждение учетной записи {user.username}'
-        message = f'Для подтверждения учетной записи {user.username} на портале \
-        {settings.DOMAIN_NAME} перейдите по ссылке: \n{settings.DOMAIN_NAME}{verify_link}'
-        return send_mail(title, message, settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
+        message = f'Для подтверждения учетной записи {user.username} на портале {settings.DOMAIN_NAME} перейдите по ссылке: \n{settings.DOMAIN_NAME}{verify_link}'
+        return send_mail(title, message, settings.EMAIL_HOST_USER, [user.email])
 
 
     def verify(request, email, activation_key):
